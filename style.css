@@ -1,6 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap");
 :root {
   --primary: #8f00ff;
+  --secondary: #f0f0f0;
+  --border: #fcddec;
+  --text-color: #000000;
+  --shadow-color: rgba(0, 0, 0, 0.36);
 }
 
 * {
@@ -27,8 +31,8 @@ html {
   background: rgba(240, 240, 240, 0.68);
   border-width: 0px 2px 1px 0px;
   border-style: solid;
-  border-color: #fcddec;
-  box-shadow: 0px 19px 41px rgba(0, 0, 0, 0.36);
+  border-color: var(--border);
+  box-shadow: 0px 19px 41px var(--shadow-color);
   border-radius: 20px;
   height: 320px;
   width: 600px;
@@ -38,6 +42,12 @@ html {
   flex-direction: column;
   gap: 20px;
   padding: 50px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0px 25px 50px rgba(0, 0, 0, 0.4);
 }
 
 .box h2 {
@@ -45,11 +55,22 @@ html {
   font-size: 32px;
   line-height: 48px;
   color: var(--primary);
+  transition: color 0.3s ease;
 }
+
+.box h2:hover {
+  color: #7a00e6;
+}
+
 .box h3 {
   font-weight: 600;
   font-size: 30px;
   line-height: 54px;
+  transition: color 0.3s ease;
+}
+
+.box h3:hover {
+  color: #7a00e6;
 }
 
 #questionForm {
@@ -61,14 +82,17 @@ html {
 
 #answerInput {
   background: transparent;
-  border: 1px solid #000000;
+  border: 1px solid var(--text-color);
   border-radius: 5px;
   padding: 10px 20px;
   font-size: 20px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
+
 #answerInput:focus-visible {
   outline: 1px solid var(--primary);
   border: 1px solid var(--primary);
+  box-shadow: 0px 0px 10px rgba(143, 0, 255, 0.5);
 }
 
 .primary-btn {
@@ -78,6 +102,18 @@ html {
   border: none;
   color: white;
   font-size: 32px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.primary-btn:hover {
+  background-color: #7a00e6;
+  transform: translateY(-5px);
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 786px) {
