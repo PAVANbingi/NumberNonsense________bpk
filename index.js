@@ -1,27 +1,20 @@
-// Part 1
-// Create a Math question
-// Math question will have a random generated
-// Question Type Multiplicatin question  with random number range 1-10
-// Answer will be the product of the random number range and the random number range
-// User will have to answer question
-// On submit  answer answer will be compared with random generated answer
-// If answer will be correct than score will be incremented
-// If answer will be wrong than score will be decremented
-
-// Generate 4 Types of question
-// For Subtract first number should be greater than second number also for Divide
-// Store the score in local storage and display the score on the screen
-// Give Feedback to user using toast
-
+// Select DOM elements
 const questionEl = document.getElementById("question");
 const questionFormEl = document.getElementById("questionForm");
 const scoreEl = document.getElementById("score");
+const timerEl = document.getElementById("timer");
+
 let storedAnswer;
-let score = localStorage.getItem("score");
+let score = parseInt(localStorage.getItem("score")) || 0;
+let timeLeft = 10; // Time per question in seconds
+let intervalId;
+
+// Utility function to generate random numbers
 const randomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
+// Generate a math question
 const generateQuestion = () => {
   const randomNumber1 = randomNumber(1, 10);
   const randomNumber2 = randomNumber(1, 10);
@@ -30,7 +23,8 @@ const generateQuestion = () => {
   let firstNumber;
   let secondNumber;
 
-  if (randomNumber1 > randomNumber2 && questionType > 2) {
+  // Ensure firstNumber is greater for subtraction and division
+  if (randomNumber1 > randomNumber2 && (questionType === 3 || questionType === 4)) {
     firstNumber = randomNumber1;
     secondNumber = randomNumber2;
   } else {
@@ -43,45 +37,48 @@ const generateQuestion = () => {
 
   switch (questionType) {
     case 1:
-      question = `Q. What is ${firstNumber} multiply by ${secondNumber} ?`;
+      question = `Q. What is ${firstNumber} multiplied by ${secondNumber}?`;
       answer = firstNumber * secondNumber;
       break;
     case 2:
-      question = `Q. What is ${firstNumber} Add to ${secondNumber} ?`;
+      question = `Q. What is ${firstNumber} added to ${secondNumber}?`;
       answer = firstNumber + secondNumber;
       break;
     case 3:
-      question = `Q. What is ${firstNumber} Divided By ${secondNumber} ?`;
-      answer = firstNumber / secondNumber;
+      question = `Q. What is ${firstNumber} divided by ${secondNumber}?`;
+      answer = (firstNumber / secondNumber).toFixed(2); // Fix to 2 decimal places
       break;
     case 4:
-      question = `Q. What is ${firstNumber} Subtract from ${secondNumber} ?`;
-      answer = firstNumber - secondNumber;
+      question = `Q. What is ${firstNumber} subtracted from ${secondNumber}?`;
+      answer = secondNumber - firstNumber;
       break;
     default:
-      question = `Q. What is ${firstNumber} Subtract from ${secondNumber} ?`;
-      answer = firstNumber - secondNumber;
+      question = `Q. What is ${firstNumber} added to ${secondNumber}?`;
+      answer = firstNumber + secondNumber;
       break;
   }
 
-  return { question, answer };
+  return { question, answer: parseFloat(answer) };
 };
 
+// Display the question and score
 const showQuestion = () => {
   const { question, answer } = generateQuestion();
   questionEl.innerText = question;
-  scoreEl.innerText = score;
+  scoreEl.innerText = `Score: ${score}`;
   storedAnswer = answer;
+  resetTimer();
+  startTimer();
 };
-showQuestion();
 
+// Check the user's answer
 const checkAnswer = (event) => {
   event.preventDefault();
   const formData = new FormData(questionFormEl);
+  const userAnswer = parseFloat(formData.get("answer"));
 
-  const userAnswer = +formData.get("answer");
   if (userAnswer === storedAnswer) {
-    score += 1;
+    score++;
     Toastify({
       text: `Correct! Your score is now ${score}. Well done!`,
       gravity: "bottom",
@@ -91,9 +88,9 @@ const checkAnswer = (event) => {
       },
     }).showToast();
   } else {
-    score -= 1;
+    score--;
     Toastify({
-      text: `Incorrect. Your score is now ${score}. Keep trying!`,
+      text: `Incorrect. The correct answer was ${storedAnswer}. Your score is now ${score}. Keep trying!`,
       gravity: "bottom",
       position: "center",
       style: {
@@ -101,9 +98,44 @@ const checkAnswer = (event) => {
       },
     }).showToast();
   }
-  scoreEl.innerText = score;
+
   localStorage.setItem("score", score);
-  event.target.reset();
   showQuestion();
-  console.log("answer", userAnswer);
+  event.target.reset();
 };
+
+// Timer functionality
+const startTimer = () => {
+  intervalId = setInterval(() => {
+    timeLeft--;
+    timerEl.innerText = `Time left: ${timeLeft}s`;
+
+    if (timeLeft <= 0) {
+      clearInterval(intervalId);
+      score--;
+      Toastify({
+        text: `Time's up! Your score is now ${score}. Keep going!`,
+        gravity: "bottom",
+        position: "center",
+        style: {
+          background: "linear-gradient(to right, #e33217, #ff001e)",
+        },
+      }).showToast();
+      localStorage.setItem("score", score);
+      showQuestion();
+    }
+  }, 1000);
+};
+
+// Reset the timer
+const resetTimer = () => {
+  clearInterval(intervalId);
+  timeLeft = 10;
+  timerEl.innerText = `Time left: ${timeLeft}s`;
+};
+
+// Initialize the game
+showQuestion();
+
+// Add event listener to the form
+questionFormEl.addEventListener("submit", checkAnswer);
